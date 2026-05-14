@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>问题反馈</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #F5F7FA;
+      min-height: 100vh;
+      padding: 40px 16px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1F1F1F;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      color: #333333;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .label .required {
+      color: #FF4D4F;
+      margin-left: 2px;
+    }
+
+    /* 单选按钮组 */
+    .radio-group {
+      display: flex;
+      gap: 24px;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .radio-item input[type="radio"] {
+      display: none;
+    }
+
+    .radio-custom {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #D9D9D9;
+      border-radius: 50%;
+      margin-right: 8px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .radio-item:hover .radio-custom {
+      border-color: #1677FF;
+    }
+
+    .radio-item input[type="radio"]:checked + .radio-custom {
+      border-color: #1677FF;
+    }
+
+    .radio-item input[type="radio"]:checked + .radio-custom::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background: #1677FF;
+      border-radius: 50%;
+    }
+
+    .radio-text {
+      font-size: 14px;
+      color: #333333;
+    }
+
+    /* 文本域 */
+    .textarea-wrapper {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 12px;
+      border: 1px solid #D9D9D9;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #333333;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
+    }
+
+    textarea:focus {
+      border-color: #1677FF;
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+    }
+
+    textarea::placeholder {
+      color: #BFBFBF;
+    }
+
+    .char-count {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 12px;
+      color: #999999;
+      pointer-events: none;
+    }
+
+    /* 添加附件 */
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      background: #FFFFFF;
+      border: 1px dashed #D9D9D9;
+      border-radius: 6px;
+      color: #666666;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-btn:hover {
+      border-color: #1677FF;
+      color: #1677FF;
+    }
+
+    .upload-btn::before {
+      content: "+";
+      font-size: 16px;
+      margin-right: 6px;
+      font-weight: bold;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* 文件预览 */
+    .file-preview {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      background: #F5F7FA;
+      border-radius: 6px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-preview.show {
+      display: flex;
+    }
+
+    .file-thumb {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #E8E8E8;
+    }
+
+    .file-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-name {
+      font-size: 14px;
+      color: #333333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: #999999;
+      margin-top: 4px;
+    }
+
+    .file-delete {
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #999999;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.2s ease;
+    }
+
+    .file-delete:hover {
+      color: #FF4D4F;
+    }
+
+    /* 开关 */
+    .switch-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .switch-label {
+      font-size: 14px;
+      color: #333333;
+    }
+
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .switch-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #D9D9D9;
+      border-radius: 12px;
+      transition: background-color 0.2s ease;
+    }
+
+    .switch-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .switch input:checked + .switch-track {
+      background: #1677FF;
+    }
+
+    .switch input:checked + .switch-track .switch-thumb {
+      transform: translateX(20px);
+    }
+
+    /* 提交按钮 */
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      background: #1677FF;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background: #4096FF;
+    }
+
+    .submit-btn:active {
+      background: #0958D9;
+    }
+
+    /* 自定义对话框 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .modal-icon.warning {
+      background: #FFF2E8;
+      color: #FA8C16;
+    }
+
+    .modal-icon.success {
+      background: #F6FFED;
+      color: #52C41A;
+    }
+
+    .modal-message {
+      font-size: 15px;
+      color: #333333;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .modal-btn {
+      padding: 8px 32px;
+      background: #1677FF;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .modal-btn:hover {
+      background: #4096FF;
+    }
+
+    /* 响应式 */
+    @media (max-width: 480px) {
+      body {
+        padding: 24px 12px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .title {
+        font-size: 18px;
+      }
+
+      .radio-group {
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1 class="title">问题反馈</h1>
+
+      <!-- 问题类型 -->
+      <div class="form-group">
+        <label class="label">问题类型<span class="required">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="issueType" value="network">
+            <span class="radio-custom"></span>
+            <span class="radio-text">网络问题</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="issueType" value="other">
+            <span class="radio-custom"></span>
+            <span class="radio-text">非网络问题</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 问题描述 -->
+      <div class="form-group">
+        <label class="label">问题描述<span class="required">*</span></label>
+        <div class="textarea-wrapper">
+          <textarea id="description" placeholder="请描述您遇到的问题..." maxlength="500"></textarea>
+          <span class="char-count"><span id="charCurrent">0</span>/500</span>
+        </div>
+      </div>
+
+      <!-- 添加附件 -->
+      <div class="form-group">
+        <label class="label">添加附件</label>
+        <label class="upload-btn" for="fileInput">添加附件</label>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg">
+        <div class="file-preview" id="filePreview">
+          <img class="file-thumb" id="fileThumb" src="" alt="预览">
+          <div class="file-info">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+          </div>
+          <button class="file-delete" id="fileDelete" title="删除">×</button>
+        </div>
+      </div>
+
+      <!-- 是否允许联系 -->
+      <div class="form-group">
+        <div class="switch-wrapper">
+          <span class="switch-label">是否允许主动联系用户</span>
+          <label class="switch">
+            <input type="checkbox" id="contactSwitch">
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 提交按钮 -->
+      <button class="submit-btn" id="submitBtn">提交</button>
+    </div>
+  </div>
+
+  <!-- 自定义对话框 -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-icon" id="modalIcon">
+        <span id="modalIconText">!</span>
+      </div>
+      <p class="modal-message" id="modalMessage"></p>
+      <button class="modal-btn" id="modalBtn">确定</button>
+    </div>
+  </div>
+
+  <script>
+    // DOM 元素
+    const issueRadios = document.querySelectorAll('input[name="issueType"]');
+    const descriptionInput = document.getElementById('description');
+    const charCurrent = document.getElementById('charCurrent');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileThumb = document.getElementById('fileThumb');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileDelete = document.getElementById('fileDelete');
+    const contactSwitch = document.getElementById('contactSwitch');
+    const submitBtn = document.getElementById('submitBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalIconText = document.getElementById('modalIconText');
+    const modalBtn = document.getElementById('modalBtn');
+
+    let selectedFile = null;
+
+    // 显示自定义对话框
+    function showModal(message, type = 'warning') {
+      modalMessage.textContent = message;
+      modalIcon.className = 'modal-icon ' + type;
+      modalIconText.textContent = type === 'warning' ? '!' : '✓';
+      modalOverlay.classList.add('show');
+    }
+
+    // 隐藏对话框
+    function hideModal() {
+      modalOverlay.classList.remove('show');
+    }
+
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // 字数统计
+    descriptionInput.addEventListener('input', function() {
+      const len = this.value.length;
+      charCurrent.textContent = len;
+
+      if (len > 500) {
+        showModal('问题描述不能超过500字');
+        this.value = this.value.substring(0, 500);
+        charCurrent.textContent = 500;
+      }
+    });
+
+    // 文件选择
+    fileInput.addEventListener('change', function() {
+      const file = this.files[0];
+
+      if (!file) return;
+
+      // 检查格式
+      const validTypes = ['image/jpeg', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        showModal('仅支持 JPG 格式的图片');
+        this.value = '';
+        return;
+      }
+
+      // 检查大小（10MB）
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        showModal('附件大小不能超过10MB');
+        this.value = '';
+        return;
+      }
+
+      // 保存文件并显示预览
+      selectedFile = file;
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        fileThumb.src = e.target.result;
+        filePreview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+
+      this.value = '';
+    });
+
+    // 删除文件
+    fileDelete.addEventListener('click', function() {
+      selectedFile = null;
+      filePreview.classList.remove('show');
+      fileThumb.src = '';
+      fileName.textContent = '';
+      fileSize.textContent = '';
+    });
+
+    // 提交
+    submitBtn.addEventListener('click', function() {
+      // 校验问题类型
+      let selectedType = null;
+      issueRadios.forEach(radio => {
+        if (radio.checked) selectedType = radio.value;
+      });
+
+      if (!selectedType) {
+        showModal('请选择问题类型');
+        return;
+      }
+
+      // 校验问题描述
+      const desc = descriptionInput.value.trim();
+      if (!desc) {
+        showModal('请输入问题描述');
+        return;
+      }
+
+      // 模拟提交
+      const formData = {
+        issueType: selectedType,
+        description: desc,
+        attachment: selectedFile ? selectedFile.name : null,
+        allowContact: contactSwitch.checked
+      };
+
+      console.log('提交数据:', formData);
+
+      showModal('提交成功，感谢您的反馈！', 'success');
+
+      // 清空表单
+      issueRadios.forEach(radio => radio.checked = false);
+      descriptionInput.value = '';
+      charCurrent.textContent = '0';
+      selectedFile = null;
+      filePreview.classList.remove('show');
+      contactSwitch.checked = false;
+    });
+
+    // 关闭对话框
+    modalBtn.addEventListener('click', hideModal);
+    modalOverlay.addEventListener('click', function(e) {
+      if (e.target === modalOverlay) hideModal();
+    });
+  </script>
+</body>
+</html>
